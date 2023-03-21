@@ -65,3 +65,15 @@ func Register(extension string, m MarshalFunc, um UnmarshalFunc) {
 store.Register("json", json.Marshal, json.Unmarshal)
 ```
 これにより、`Load`関数や`Save`関数でjsonフォーマットが指定された場合に、`json.Marshal`関数と`json.Unmarshal関`数が使用されるようになります。
+
+## LoadWith function
+```go
+func LoadWith(path string, v interface{}, um UnmarshalFunc) error {
+//...
+}
+```
+この関数は、引数で指定されたパスにある設定ファイルを読み込み、指定されたオブジェクトに設定をマーシャルします。`um`引数は、設定をアンマーシャルするために使用する関数を指定します。
+
+関数の最初の部分では、設定ファイルが存在しない場合の処理が行われます。この場合、`Save`関数を使用して新しい設定ファイルを作成します。新しい設定ファイルには、指定されたオブジェクトの型と同じ型の空のオブジェクトが含まれます。その後、新しいオブジェクトに対して`v`変数を更新し、エラーを返す代わりにnilを返します。
+
+ファイルが存在する場合、指定された設定ファイルを読み込み、`um`関数を使用してオブジェクトに設定をアンマーシャルします。アンマーシャルに失敗した場合、エラーを返します。正常に読み込んだ場合は、何も返さずに関数を終了します。
