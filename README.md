@@ -48,4 +48,20 @@ if err != nil {
     // エラー処理
 }
 ```
+
+## Registar function
 この例では、`configData`という名前の設定データを`config.json`というファイルに保存しています。
+
+```go
+func Register(extension string, m MarshalFunc, um UnmarshalFunc) {
+//...
+}
+```
+この関数は、`extension`というファイル名の拡張子に対応するマーシャルとアンマーシャルの関数を登録するために使用されます。一度登録されたフォーマットは、`Load`関数と`Save`関数と互換性があります。
+
+例えば、`json`拡張子に対するマーシャルとアンマーシャル関数を登録する場合は、以下のようになります。
+
+```go
+store.Register("json", json.Marshal, json.Unmarshal)
+```
+これにより、`Load`関数や`Save`関数でjsonフォーマットが指定された場合に、`json.Marshal`関数と`json.Unmarshal関`数が使用されるようになります。
