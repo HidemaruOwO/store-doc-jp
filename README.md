@@ -77,3 +77,20 @@ func LoadWith(path string, v interface{}, um UnmarshalFunc) error {
 関数の最初の部分では、設定ファイルが存在しない場合の処理が行われます。この場合、`Save`関数を使用して新しい設定ファイルを作成します。新しい設定ファイルには、指定されたオブジェクトの型と同じ型の空のオブジェクトが含まれます。その後、新しいオブジェクトに対して`v`変数を更新し、エラーを返す代わりにnilを返します。
 
 ファイルが存在する場合、指定された設定ファイルを読み込み、`um`関数を使用してオブジェクトに設定をアンマーシャルします。アンマーシャルに失敗した場合、エラーを返します。正常に読み込んだ場合は、何も返さずに関数を終了します。
+## SaveWith
+SaveWith関数は、指定されたファイルパスに設定を保存するために使用されます。保存する設定は、interface{}型の引数vとして渡され、任意のUnmarshalerでアンマーシャリング可能である必要があります。また、保存するファイルの形式を指定するために、任意のMarshalFunc関数も渡すことができます。
+
+```go
+func SaveWith(path string, v interface{}, mf MarshalFunc) error {
+	// ...
+}
+```
+例えば、次のように使用できます。
+
+```go
+err := store.SaveWith("config.json", configData, json.Marshal)
+if err != nil {
+    // エラー処理
+}
+```
+この例では、configDataという名前の設定データをconfig.jsonというファイルにJSON形式で保存しています。json.Marshalは、Goの標準ライブラリで提供されているJSONマーシャリング関数です。
