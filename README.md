@@ -1,6 +1,18 @@
 # store-doc-jp
 [tucnak/store](https://github.com/tucnak/store)の日本語ドキュメント GPT-3が生成
 
+## Init function
+```go
+func Init(application string) {
+	// ...
+}
+```
+このコードは、構成データを保存するディレクトリ名を設定するための関数です。
+この関数を呼び出すことで、アプリケーションの名前を引数として渡すことができます。
+この名前は、構成データが保存されるディレクトリ名として使用されます。
+デフォルトでは、StoreはLinuxシステムの場合は$ XDG_CONFIG_HOMEまたは$ HOME、Windowsの場合は% APPDATA%にすべての構成データを配置します。
+ただし、この関数を呼び出す前に、Storeは機密情報を扱う呼び出しでパニックすることがあるため、注意が必要です。
+
 ## Load function
 
 `Load`関数は、指定された設定名に基づいて構成ディレクトリから設定ファイルを読み込む関数です。もし設定ファイルが存在しない場合は、新しいオブジェクトを作成します。
@@ -8,7 +20,6 @@
 以下はLoad関数の形式になります。
 
 ```go
-Copy code
 func Load(configName string, v interface{}) error {
     // ...
 }
