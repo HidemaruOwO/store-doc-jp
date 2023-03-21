@@ -38,7 +38,8 @@ func Save(path string, v interface{}) error {}
 この関数は、以下のエラーを返す場合があります。
 
 `store: application name not defined` : アプリケーション名が定義されていない場合に発生します。
-`store: unknown configuration format`! : 対応するフォーマットが定義されていない場合に発生します。
+
+`store: unknown configuration format!` : 対応するフォーマットが定義されていない場合に発生します。
 例えば、以下のように使用できます。
 
 ```go
