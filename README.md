@@ -94,3 +94,27 @@ if err != nil {
 }
 ```
 この例では、`configData`という名前の設定データを`config.json`というファイルにJSON形式で保存しています。`json.Marshal`は、Goの標準ライブラリで提供されているJSONマーシャリング関数です。
+
+# SetApplicationName
+
+`SetApplicationName`関数は、アプリケーション名を設定するために使用される関数です。
+
+以下は`SetApplicationName`関数の形式になります。
+
+```go
+func SetApplicationName(name string) {
+	applicationName = name
+}
+```
+`name`引数は、設定するアプリケーション名を指定する文字列です。
+
+`SetApplicationName`関数は、引数に渡されたアプリケーション名をグローバル変数`applicationName`に設定します。この変数は、`Load`関数や`Save`関数など、他の関数で使用されます。
+
+`SetApplicationName`関数は、通常、アプリケーションの起動時に呼び出されます。アプリケーション名は、設定ファイル名を作成するために使用されます。たとえば、アプリケーション名が`myapp`である場合、設定ファイルのデフォルト名は`myapp.config`になります。
+
+以下は、`SetApplicationName`関数の使用例です。
+
+```go
+store.SetApplicationName("myapp")
+```
+この例では、アプリケーション名をmyappに設定しています。`Load`関数や`Save`関数は、このアプリケーション名を使用して設定ファイル名を作成します。
