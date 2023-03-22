@@ -4,7 +4,7 @@
 ## Init function
 ```go
 func Init(application string) {
-	// ...
+	// create file .config/$application
 }
 ```
 このコードは、構成データを保存するディレクトリ名を設定するための関数です。
