@@ -95,7 +95,7 @@ if err != nil {
 ```
 この例では、`configData`という名前の設定データを`config.json`というファイルにJSON形式で保存しています。`json.Marshal`は、Goの標準ライブラリで提供されているJSONマーシャリング関数です。
 
-# SetApplicationName
+## SetApplicationName
 
 `SetApplicationName`関数は、アプリケーション名を設定するために使用される関数です。
 
