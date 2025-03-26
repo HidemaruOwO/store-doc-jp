@@ -1,120 +1,220 @@
-# store-doc-jp
-[tucnak/store](https://github.com/tucnak/store)の日本語ドキュメント
+# Store Library: Configuration Management for Go Applications
 
-## Init function
+## Overview
+The `store` library is a simple configuration management package for Go applications that supports multiple file formats and platform-independent configuration storage.
+
+## Features
+- Supports configuration storage in multiple formats:
+  - JSON
+  - YAML
+  - TOML
+- Platform-independent configuration file paths
+  - Linux: `$XDG_CONFIG_HOME` or `$HOME/.config`
+  - Windows: `%APPDATA%`
+- Easy configuration loading and saving
+- Extensible with custom file formats
+
+## Installation
+```bash
+go get github.com/[repository]/store
+```
+
+## Quick Start
+
+### 1. Initialize the Library
+Before using the library, initialize it with your application name:
 ```go
-func Init(application string) {
-	// create file .config/$application
+store.Init("MyAwesomeApp")
+```
+
+### 2. Define a Configuration Struct
+```go
+type AppConfig struct {
+    DatabaseURL string `json:"database_url"`
+    LogLevel    string `json:"log_level"`
+    MaxRetries  int    `json:"max_retries"`
 }
 ```
-このコードは、構成データを保存するディレクトリ名を設定するための関数です。
-この関数を呼び出すことで、アプリケーションの名前を引数として渡すことができます。
-この名前は、構成データが保存されるディレクトリ名として使用されます。
-デフォルトでは、StoreはLinuxシステムの場合は$ XDG_CONFIG_HOMEまたは$ HOME、Windowsの場合は% APPDATA%にすべての構成データを配置します。
-ただし、この関数を呼び出す前に、Storeは機密情報を扱う呼び出しでパニックすることがあるため、注意が必要です。
 
-## Load function
-
-`Load`関数は、指定された設定名に基づいて構成ディレクトリから設定ファイルを読み込む関数です。もし設定ファイルが存在しない場合は、新しいオブジェクトを作成します。
-
-以下はLoad関数の形式になります。
-
+### 3. Loading Configuration
 ```go
-func Load(configName string, v interface{}) error {
-    // ...
-}
-```
-configNameは、設定ファイル名です。
-vは、読み込んだ設定を格納するオブジェクトです。このオブジェクトは、構造体である必要があります。
-Load関数は、設定ファイルを指定された構造体型に読み込みます。読み込みに失敗した場合は、エラーを返します。設定ファイルが存在しない場合は、新しいオブジェクトを作成して返します。
-
-## Save function
-```go
-func Save(path string, v interface{}) error {}
-```
-`Save`関数は、指定されたファイルパスに対して設定を保存するために使用されます。
-保存する設定は、インターフェイス型の引数`v`として渡されます。ファイルパスの拡張子に応じて、適切なフォーマットで保存されます。
-
-この関数は、以下のエラーを返す場合があります。
-
-`store: application name not defined` : アプリケーション名が定義されていない場合に発生します。
-
-`store: unknown configuration format!` : 対応するフォーマットが定義されていない場合に発生します。
-例えば、以下のように使用できます。
-
-```go
-err := store.Save("config.json", configData)
+config := &AppConfig{}
+err := store.Load("config.json", config)
 if err != nil {
-    // エラー処理
+    // Handle error
 }
 ```
 
-## Registar function
-この例では、`configData`という名前の設定データを`config.json`というファイルに保存しています。
-
+### 4. Saving Configuration
 ```go
-func Register(extension string, m MarshalFunc, um UnmarshalFunc) {
-//...
+config := &AppConfig{
+    DatabaseURL: "postgres://localhost/mydb",
+    LogLevel:    "info",
+    MaxRetries:  3,
 }
-```
-この関数は、`extension`というファイル名の拡張子に対応するマーシャルとアンマーシャルの関数を登録するために使用されます。一度登録されたフォーマットは、`Load`関数と`Save`関数と互換性があります。
-
-例えば、`json`拡張子に対するマーシャルとアンマーシャル関数を登録する場合は、以下のようになります。
-
-```go
-store.Register("json", json.Marshal, json.Unmarshal)
-```
-これにより、`Load`関数や`Save`関数でjsonフォーマットが指定された場合に、`json.Marshal`関数と`json.Unmarshal関`数が使用されるようになります。
-
-## LoadWith function
-```go
-func LoadWith(path string, v interface{}, um UnmarshalFunc) error {
-//...
-}
-```
-この関数は、引数で指定されたパスにある設定ファイルを読み込み、指定されたオブジェクトに設定をマーシャルします。`um`引数は、設定をアンマーシャルするために使用する関数を指定します。
-
-関数の最初の部分では、設定ファイルが存在しない場合の処理が行われます。この場合、`Save`関数を使用して新しい設定ファイルを作成します。新しい設定ファイルには、指定されたオブジェクトの型と同じ型の空のオブジェクトが含まれます。その後、新しいオブジェクトに対して`v`変数を更新し、エラーを返す代わりにnilを返します。
-
-ファイルが存在する場合、指定された設定ファイルを読み込み、`um`関数を使用してオブジェクトに設定をアンマーシャルします。アンマーシャルに失敗した場合、エラーを返します。正常に読み込んだ場合は、何も返さずに関数を終了します。
-## SaveWith
-`SaveWith`関数は、指定されたファイルパスに設定を保存するために使用されます。保存する設定は、`interface{}`型の引数`v`として渡され、任意の`Unmarshalerで`アンマーシャリング可能である必要があります。また、保存するファイルの形式を指定するために、任意の`MarshalFunc`関数も渡すことができます。
-
-```go
-func SaveWith(path string, v interface{}, mf MarshalFunc) error {
-	// ...
-}
-```
-例えば、次のように使用できます。
-
-```go
-err := store.SaveWith("config.json", configData, json.Marshal)
+err := store.Save("config.json", config)
 if err != nil {
-    // エラー処理
+    // Handle error
 }
 ```
-この例では、`configData`という名前の設定データを`config.json`というファイルにJSON形式で保存しています。`json.Marshal`は、Goの標準ライブラリで提供されているJSONマーシャリング関数です。
 
-## SetApplicationName
+## Advanced Usage
 
-`SetApplicationName`関数は、アプリケーション名を設定するために使用される関数です。
-
-以下は`SetApplicationName`関数の形式になります。
-
+### Custom File Formats
+You can register custom file formats:
 ```go
-func SetApplicationName(name string) {
-	applicationName = name
+store.Register("xml", 
+    xml.Marshal,     // Marshaling function
+    xml.Unmarshal   // Unmarshaling function
+)
+```
+
+### Loading with Custom Unmarshaler
+```go
+err := store.LoadWith("config.custom", config, customUnmarshalFunc)
+```
+
+### Saving with Custom Marshaler
+```go
+err := store.SaveWith("config.custom", config, customMarshalFunc)
+```
+
+## Important Notes
+- Always call `store.Init()` before using other library functions
+- Supports `.json`, `.yaml`, `.yml`, and `.toml` out of the box
+- Configuration files are created automatically if they don't exist
+- Panics if application name is not set before usage
+
+## Error Handling
+- Handles file read/write errors
+- Provides detailed error messages for marshaling/unmarshaling failures
+
+## Platform Support
+- Fully compatible with Linux and Windows
+- Automatically uses appropriate configuration directories
+
+## Deprecated Methods
+- `SetApplicationName()` is deprecated; use `Init()` instead
+
+## Function Examples
+
+### `Init(application string)`
+```go
+// Initialize the store for your application
+store.Init("MyAwesomeApp")
+// This sets up configuration storage in:
+// - Linux: ~/.config/MyAwesomeApp/
+// - Windows: %APPDATA%/MyAwesomeApp/
+```
+
+### `Load(path string, v interface{}) error`
+```go
+type ServerConfig struct {
+    Host string `json:"host"`
+    Port int    `json:"port"`
+}
+
+config := &ServerConfig{}
+err := store.Load("server.json", config)
+if err != nil {
+    log.Fatal(err)
+}
+// If server.json doesn't exist, an empty configuration 
+// file will be created automatically
+```
+
+### `Save(path string, v interface{}) error`
+```go
+config := &ServerConfig{
+    Host: "localhost",
+    Port: 8080,
+}
+
+err := store.Save("server.json", config)
+if err != nil {
+    log.Fatal(err)
+}
+// This will create server.json in the application's config directory
+```
+
+### `LoadWith(path string, v interface{}, um UnmarshalFunc) error`
+```go
+// Custom unmarshaling example
+customConfig := &MySpecialConfig{}
+err := store.LoadWith("custom.cfg", 
+    customConfig, 
+    func(data []byte, v interface{}) error {
+        // Implement custom unmarshaling logic
+        return customUnmarshalFunc(data, v)
+    }
+)
+```
+
+### `SaveWith(path string, v interface{}, m MarshalFunc) error`
+```go
+err := store.SaveWith("custom.cfg", 
+    myConfig, 
+    func(v interface{}) ([]byte, error) {
+        // Implement custom marshaling logic
+        return customMarshalFunc(v)
+    }
+)
+```
+
+### `Register(extension string, m MarshalFunc, um UnmarshalFunc)`
+```go
+// Adding support for a new configuration format
+store.Register("xml", 
+    xml.Marshal,     // Marshaling function
+    xml.Unmarshal   // Unmarshaling function
+)
+
+// Now you can use .xml files with Load and Save
+type XMLConfig struct {
+    XMLName xml.Name `xml:"config"`
+    Key     string   `xml:"key"`
 }
 ```
-`name`引数は、設定するアプリケーション名を指定する文字列です。
 
-`SetApplicationName`関数は、引数に渡されたアプリケーション名をグローバル変数`applicationName`に設定します。この変数は、`Load`関数や`Save`関数など、他の関数で使用されます。
-
-`SetApplicationName`関数は、通常、アプリケーションの起動時に呼び出されます。アプリケーション名は、設定ファイル名を作成するために使用されます。たとえば、アプリケーション名が`myapp`である場合、設定ファイルのデフォルト名は`myapp.config`になります。
-
-以下は、`SetApplicationName`関数の使用例です。
-
+## Complete Example
 ```go
-store.SetApplicationName("myapp")
+package main
+
+import (
+    "log"
+    "github.com/yourname/store"
+)
+
+type AppConfig struct {
+    DatabaseURL string `json:"database_url"`
+    LogLevel    string `json:"log_level"`
+    MaxRetries  int    `json:"max_retries"`
+}
+
+func main() {
+    // Initialize the store
+    store.Init("MyApp")
+
+    // Load existing configuration
+    config := &AppConfig{}
+    err := store.Load("config.json", config)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    // Modify configuration
+    config.LogLevel = "debug"
+
+    // Save updated configuration
+    err = store.Save("config.json", config)
+    if err != nil {
+        log.Fatal(err)
+    }
+}
 ```
-この例では、アプリケーション名をmyappに設定しています。`Load`関数や`Save`関数は、このアプリケーション名を使用して設定ファイル名を作成します。
+
+## Key Considerations
+- Always call `store.Init()` before using other functions
+- Supports JSON, YAML, and TOML out of the box
+- Automatically creates configuration files if they don't exist
+- Platform-independent configuration storage
