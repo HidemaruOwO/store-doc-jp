@@ -1,3 +1,6 @@
+> [!NOTE]
+> There is a document written by Claude 3.5 Haiku for me.
+
 # Store Library: Configuration Management for Go Applications
 
 ## Overview
